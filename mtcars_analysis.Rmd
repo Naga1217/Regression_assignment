@@ -1,0 +1,129 @@
+##Assignment
+
+##Description
+The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). 
+mtcars
+A data frame with 32 observations on 11 variables. 
+[, 1] 	mpg 	Miles/(US) gallon 
+[, 2] 	cyl 	Number of cylinders 
+[, 3] 	disp 	Displacement (cu.in.) 
+[, 4] 	hp 	Gross horsepower 
+[, 5] 	drat 	Rear axle ratio 
+[, 6] 	wt 	Weight (1000 lbs) 
+[, 7] 	qsec 	1/4 mile time 
+[, 8] 	vs 	V/S 
+[, 9] 	am 	Transmission (0 = automatic, 1 = manual) 
+[,10] 	gear 	Number of forward gears 
+[,11] 	carb 	Number of carburetors 
+##Source
+Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411. 
+##Analysis:
+In this report we analysed mtcars datasets to find the relationship between MPG(Miles per Gallon) and rest of the variables in a dataset. We use regression models and exploratory data analysis to find out how  automatic(0=automatic) and manual transmissions will affect MPG variable.
+##Importing data:
+## In this step we will  load the data in to R
+Data(mtcars)
+## Checking the dimesions and type of data
+Str(mtcars)
+## Have a look at the data 
+View(mtcars)
+##Data cleaning:
+## check if it is necessary to convert any numeric class data to factor data for analysis.
+mtcars$cyl <- as.factor(mtcars$cyl)
+mtcars$vs <-  as.factor(mtcars$vs)
+mtcars$am <- as.factor(mtcars$am)
+mtcars$gear <- as.factor(mtcars$gear)
+mtcars$carb <- as.factor(mtcars$carb)
+attach(mtcars)
+## check the contents to see if we successfully convert the class type
+Str(mtcars)
+## check for missing values in all variables
+mtcars[!complete.cases(mtcars), ] ## not recommended approach if dataset is large.
+## Will check for the outliers after model is built as it will be more accurate and we will come to know which variables are significant and will explain more variability in model (adj R-sq)
+##Exploratory Data analysis:
+## Try to visualise the data before modelling it to have clear picture
+## use boxplot to see the effect  of transmission on MPG.
+boxplot(mpg~am,xlab="Transmission(0 = Automatic, 1 = Manual)",ylab="MPG",main= "Boxplot of MPG vs Transmission")
+## we can clear see from boxplot the manual transmission yields higher MPG than automatic transmission.
+## use pair graph to have a look and feel , how the variables in dataset correlated..
+pairs(mtcars,panel=panel.smooth,main="Pair Graph of Motor Trend Car Road Tests")
+
+
+
+
+
+##Modelling the Data:
+## Lets do an normality test to check for normality for MPG before performing two sample t-test 
+with(mtcars,tapply(mpg,am,shapiro.test))
+## As the p values are larger for both samples (am=0,am=1) we can confirm that MPG data is distributed normally with am. (Null hypothesis – normal ditstribution hold)
+##Two sample t-test:
+result <- t.test(mpg ~ am)
+result$p.value
+result$estimate
+##As the result of pvalue is 0.0013 we reject the null hypothesis, so there is significant difference between automation and manual transmission for MPG.
+##Mean for MPG of manual transmitted is about 7 units more than that of automated transmitted cars..
+##Regression:
+## We will go for regression to check if  MPG is affected by any other variables rather than only am.
+## Initially we include every variable in model..
+full_allvar <- lm(mpg~.,data=mtcars)
+summary(full_allvar)
+##Results shown that none of the coefficients  were significant 
+## possible reasons may be due to multi collinearity issue.
+## lets try with backward regression model
+backward_reg_allvar <- step(full_allvar,data=mtcars,direction="backward")
+summary(backward_reg_allvar)
+##This model  “mpg ~ cyl + hp + wt + am” has the residual standard error of 2.41 with 26 degrees of freedom. Adj R-sq is 84.02 percent, which mean this model can explain about 84 percent of variance in MPG variable. But the am coefficient is not significant at 0.05 level which is not good.
+
+
+
+##Use Correlation in Regression to add variables:
+## Lets change the approach and look for the variables which are correlated with MPG and include them in the model, provided am should be also significant along with included other metric variable at 0.05 level.
+am_wt <- lm(mpg ~ am+wt,data=mtcars)
+summary(am_wt)
+##This model  “mpg ~ wt + am”  has the residual standard error of 3.098 with 29 degrees of freedom. Adj R-sq is 73.02 percent, which mean this model can explain about 73 percent of variance in MPG variable. But the am coefficient is not significant at 0.05 level which is not good.
+am_disp <- lm(mpg ~ am+disp,data=mtcars)
+summary(am_disp)
+##This model  “mpg ~ wt + disp” has the residual standard error of 3.218 with 29 degrees of freedom. Adj R-sq is 71.02 percent, which mean this model can explain about 71 percent of variance in MPG variable. But the am coefficient is not significant at 0.05 level which is not good.
+
+ am_hp <- lm(mpg ~ am+hp,data=mtcars)
+summary(am_hp)
+##This model  “mpg ~ am + hp” has the residual standard error of 2.909 with 29 degrees of freedom. Adj R-sq is 76.02 percent, which mean this model can explain about 76 percent of variance in MPG variable and  am coefficient is not significant at 0.05 level which is  good.
+##But here the adj R-sq value is less. We will try to include more highly correlated variable with MPG and check do it make the difference.
+ am_hp_wt <- lm(mpg ~ am+hp+wt,data=mtcars)
+ summary(am_hp_wt)
+##This model  “mpg ~ am+ hp +wt” has the residual standard error of 2.53 with 28 degrees of freedom. Adj R-sq is 82.02 percent, which mean this model can explain about 82 percent of variance in MPG variable but am coefficient is not significant at 0.05 level which is  not good.
+##So again the multi collinearity issue comes in. 
+##We will now try to include a model in which one variable is highly correlated with MPG(wt) and other variable which is weakly correlated with MPG(qsec)  to avoid mulit collinearity issue..
+
+
+am_wt_qsec <- lm(mpg ~ am+wt+qsec,data=mtcars)
+ summary(am_wt_qsec)
+##This model  “mpg ~ am+wt+qsec” has the residual standard error of 2.45 with 28 degrees of freedom. Adj R-sq is 83.36 percent, which mean this model can explain about 83 percent of variance in MPG variable and all variables are significant at 0.05 level which is  good.
+##As we already checked remaining possibilities using back ward regression. Lets finalise this model mpg ~ am+wt+qsec and look for interactions if any that can improve the variance explained by fit.
+##From the below scatter plot we observed that there is interaction between wt and am so lets include in the model.
+Library(ggplot)
+ggplot(mtcars,aes(x=wt,y=mpg,group=am,color=am,height=3,width=3)) + geom_point() + scale_colour_discrete(labels = c("Automatic","Manual"))+xlab("weight") + ggtitle("Scatter Plot of MPG vs Weight by Transmission")
+amintwt_qsec <- lm(mpg ~ am+wt+qsec+am:wt,data=mtcars)
+ summary(amintwt_qsec)
+##This model  “mpg ~ am+wt+qsec+am:wt” has the residual standard error of 2.08 with 27 degrees of freedom. Adj R-sq is 88.04 percent, which mean this model can explain about 88 percent of variance in MPG variable and all variables are significant at 0.05 level which is  good.
+##We will finalise the fit by comparing with anova, to check whether the selected models for final fit  are different or not.
+am_wt_qsec <- lm(mpg ~ am+wt+qsec,data=mtcars)
+amintwt_qsec <- lm(mpg ~ am+wt+qsec+am:wt,data=mtcars)
+anova(am_wt_qsec, amintwt_qsec)
+anova shows both models are different, so we will select this model 
+“mpg ~ am+wt+qsec+am:wt” which has more adj Rsquare(88.04) and where all variable coefficients are significant at 0.05 level.
+Confint(amintwt_asec)
+
+##Inference:
+##We can interpret from results by holding wt and qsec constant, the cars with manual transmission provide 14.07 + (-4.14)*wt more MPG miles per gallon on average when compared with automatic transmission cars.
+
+
+##Residual analysis and Diagnostics:
+  par(mfcol=c(2,2))
+  plot(amintwt_qsec)
+##
+##1. The Residuals vs. Fitted plot shows no consistent pattern, so it a good sign .
+##2. The Normal Q-Q plot indicates that the residuals are normally distributed because the points lie closely to each other in a straight line.
+##3. The Scale-Location plot confirms the constant variance assumption, as the points are randomly distributed.
+##4. The Residuals vs. Leverage confirms that no outliers are present that can impact the model.
+##Summary:
+##In this report, We use regression models and exploratory data analyses to mainly explore how automatic (am = 0) and manual (am = 1) transmissions features affect the MPG feature. The t-test  or simple linear regression model shows that the performance difference between cars with automatic and manual transmission. And it is about 7 MPG more for cars with manual transmission than those with automatic transmission. Then, we fit several linear regression models and select the one with highest Adjusted R-squared value. So, given that weight and 1/4 mile time are held constant, manual transmitted cars are 14.079 + (-4.141)*wt  give more MPG (miles per gallon) on average better than automatic transmitted cars. 
