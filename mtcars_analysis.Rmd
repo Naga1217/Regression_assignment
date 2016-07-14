@@ -86,7 +86,7 @@ summary(am_disp)
 
  am_hp <- lm(mpg ~ am+hp,data=mtcars)
 summary(am_hp)
-##This model  “mpg ~ am + hp” has the residual standard error of 2.909 with 29 degrees of freedom. Adj R-sq is 76.02 percent, which mean this model can explain about 76 percent of variance in MPG variable and  am coefficient is not significant at 0.05 level which is  good.
+##This model  “mpg ~ am + hp” has the residual standard error of 2.909 with 29 degrees of freedom. Adj R-sq is 76.02 percent, which mean this model can explain about 76 percent of variance in MPG variable and  am coefficient is significant at 0.05 level which is  good.
 ##But here the adj R-sq value is less. We will try to include more highly correlated variable with MPG and check do it make the difference.
  am_hp_wt <- lm(mpg ~ am+hp+wt,data=mtcars)
  summary(am_hp_wt)
@@ -109,8 +109,8 @@ amintwt_qsec <- lm(mpg ~ am+wt+qsec+am:wt,data=mtcars)
 am_wt_qsec <- lm(mpg ~ am+wt+qsec,data=mtcars)
 amintwt_qsec <- lm(mpg ~ am+wt+qsec+am:wt,data=mtcars)
 anova(am_wt_qsec, amintwt_qsec)
-anova shows both models are different, so we will select this model 
-“mpg ~ am+wt+qsec+am:wt” which has more adj Rsquare(88.04) and where all variable coefficients are significant at 0.05 level.
+##anova shows both models are different, so we will select this model 
+##“mpg ~ am+wt+qsec+am:wt” which has more adj Rsquare(88.04) and where all variable coefficients are significant at 0.05 level.
 Confint(amintwt_asec)
 
 ##Inference:
