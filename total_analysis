@@ -1,7 +1,9 @@
 Assignment
 
 Description
-The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). 
+The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and 
+performance for 32 automobiles (1973–74 models). 
+
 mtcars
 A data frame with 32 observations on 11 variables. 
 [, 1] 	mpg 	Miles/(US) gallon 
@@ -15,10 +17,12 @@ A data frame with 32 observations on 11 variables.
 [, 9] 	am 	Transmission (0 = automatic, 1 = manual) 
 [,10] 	gear 	Number of forward gears 
 [,11] 	carb 	Number of carburetors 
+
 Source
 Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411. 
 Analysis:
-In this report we analysed mtcars datasets to find the relationship between MPG(Miles per Gallon) and rest of the variables in a dataset. We use regression models and exploratory data analysis to find out how  automatic(0=automatic) and manual transmissions will affect MPG variable.
+In this report we analysed mtcars datasets to find the relationship between MPG(Miles per Gallon) and rest of the variables in a dataset. 
+We use regression models and exploratory data analysis to find out how  automatic(0=automatic) and manual transmissions will affect MPG variable.
 Importing data:
 ## In this step we will  load the data in to R
 Data(mtcars)
